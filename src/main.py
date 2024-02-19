@@ -30,7 +30,7 @@ def main():
         writer.writeheader()
         writer.writerows(worklog_entries)
 
-    print('Worklog updated!')
+    print('{} Worklog updated!'.format(now.strftime('%H:%M')))
 
 
 if __name__ == '__main__':
