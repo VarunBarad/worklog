@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import csv
 import datetime
 
@@ -31,7 +28,3 @@ def main():
         writer.writerows(worklog_entries)
 
     print('{} Worklog updated!'.format(now.strftime('%H:%M')))
-
-
-if __name__ == '__main__':
-    main()
