@@ -1,5 +1,9 @@
+mod file_handler;
+
+use std::fs::OpenOptions;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
+use crate::file_handler::ensure_file_exists;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct LogRecord {
@@ -10,14 +14,7 @@ struct LogRecord {
 fn main() {
     const FILE_PATH: &str = "/Users/varunb/worklog.csv";
 
-    let mut records: Vec<LogRecord> = vec![];
-    {
-        let mut reader = csv::Reader::from_path(FILE_PATH).unwrap();
-        for record in reader.deserialize() {
-            let record: LogRecord = record.unwrap();
-            records.push(record);
-        }
-    }
+    ensure_file_exists(FILE_PATH);
 
     print!("Log entry: ");
     std::io::stdout().flush().unwrap();
@@ -25,16 +22,20 @@ fn main() {
     std::io::stdin().read_line(&mut contents).unwrap();
 
     let now = chrono::offset::Local::now();
-    records.push(LogRecord {
+    let record = LogRecord {
         timestamp: now.format("%Y-%m-%dT%H:%M%:z").to_string(),
         contents: contents.trim().to_owned(),
-    });
+    };
+
+    let mut csv_buffer = csv::WriterBuilder::new()
+        .has_headers(false)
+        .from_writer(vec![]);
+    csv_buffer.serialize(record).unwrap();
+    csv_buffer.flush().unwrap();
+    let record_string = String::from_utf8(csv_buffer.into_inner().unwrap()).unwrap();
 
     {
-        let mut writer = csv::Writer::from_path(FILE_PATH).unwrap();
-        for record in records {
-            writer.serialize(record).unwrap();
-        }
-        writer.flush().unwrap();
+        let mut file = OpenOptions::new().append(true).open(FILE_PATH).unwrap();
+        write!(file, "{}", record_string).unwrap();
     }
 }
