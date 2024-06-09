@@ -16,7 +16,7 @@ fn main() {
 
     ensure_file_exists(FILE_PATH);
 
-    print!("Log entry: ");
+    println!("Enter the new worklog entry:");
     std::io::stdout().flush().unwrap();
     let mut contents: String = String::new();
     std::io::stdin().read_line(&mut contents).unwrap();
