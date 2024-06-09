@@ -8,9 +8,11 @@ struct LogRecord {
 }
 
 fn main() {
+    const FILE_PATH: &str = "/Users/varunb/worklog.csv";
+
     let mut records: Vec<LogRecord> = vec![];
     {
-        let mut reader = csv::Reader::from_path("/Users/varunb/worklog.csv").unwrap();
+        let mut reader = csv::Reader::from_path(FILE_PATH).unwrap();
         for record in reader.deserialize() {
             let record: LogRecord = record.unwrap();
             records.push(record);
@@ -29,7 +31,7 @@ fn main() {
     });
 
     {
-        let mut writer = csv::Writer::from_path("/Users/varunb/worklog.csv").unwrap();
+        let mut writer = csv::Writer::from_path(FILE_PATH).unwrap();
         for record in records {
             writer.serialize(record).unwrap();
         }
