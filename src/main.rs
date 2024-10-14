@@ -1,14 +1,26 @@
 mod file_handler;
 
-use std::fs::OpenOptions;
-use serde::{Deserialize, Serialize};
-use std::io::Write;
 use crate::file_handler::ensure_file_exists;
+use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
+use std::fs::OpenOptions;
+use std::io::Write;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct LogRecord {
     timestamp: String,
     contents: String,
+}
+
+impl LogRecord {
+    fn new(timestamp: DateTime<Local>, contents: String) -> LogRecord {
+        let format_string = "%Y-%m-%dT%H:%M%:z";
+
+        LogRecord {
+            timestamp: timestamp.format(format_string).to_string(),
+            contents: contents.trim().to_owned(),
+        }
+    }
 }
 
 fn main() {
@@ -22,10 +34,7 @@ fn main() {
     std::io::stdin().read_line(&mut contents).unwrap();
 
     let now = chrono::offset::Local::now();
-    let record = LogRecord {
-        timestamp: now.format("%Y-%m-%dT%H:%M%:z").to_string(),
-        contents: contents.trim().to_owned(),
-    };
+    let record = LogRecord::new(now, contents);
 
     let mut csv_buffer = csv::WriterBuilder::new()
         .has_headers(false)
